@@ -34,8 +34,10 @@ class MinesweeperEnv(object):
         self.emptycell2 = pygame.image.load('emptycell2.png')
         self.bombimg = pygame.image.load("bomb.png")
         self.markedimg = pygame.image.load("marked.png")
+        pygame.init() 
         self.game_opening(self.width,self.height,self.screen,self.initialadd)
         self.font = pygame.font.Font('mine-sweeper.ttf', 18)
+        self.colors=[(0,0,255),(0,123,0),(255,0,0),(0,0,123),(123,0,0),(0,123,123),(0,0,0),(123,123,123)]
     def game_opening(self,width,height,screen,initialadd):
         # screen.blit()
         gray = (198, 198, 198)
@@ -83,7 +85,7 @@ class MinesweeperEnv(object):
 
         # create a text surface object,
         # on which text is drawn on it.
-        text = self.font.render(str(number), True,colors[number-1])  
+        text = self.font.render(str(number), True,self.colors[number-1])  
         # create a rectangular object for the
         # text surface object
         textRect = text.get_rect()
@@ -127,7 +129,11 @@ class MinesweeperEnv(object):
         grid=self.grid
         for idx,i in enumerate(self.state):
             print(str(np.reshape(i,-1))+"          "+str(grid[idx]))
-           
+
+    def draw_grid(self):
+        grid=self.grid
+        for idx,i in enumerate(self.state):
+            print(str(grid[idx]))          
 
 
     def reset(self):
@@ -157,10 +163,12 @@ class MinesweeperEnv(object):
             return 0
         self.listtoadd.append(action)
 
-        # print("in")
+
         if(self.grid[action[1]][action[0]]==-1):
+
             return 0
         elif(self.grid[action[1]][action[0]]!=0):
+
 
             # screen.blit(emptycell2,(cellnumber[0]*36,cellnumber[1]*36+initialadd))
             # pygame.display.update()
@@ -168,6 +176,7 @@ class MinesweeperEnv(object):
             self.state[action[1]][action[0]][0]=self.grid[action[1]][action[0]]
             return 0
         else:
+
             self.state[action[1]][action[0]][0]=0
             ####Top Check
             if(action[1]-1>=0):
@@ -204,9 +213,8 @@ class MinesweeperEnv(object):
         grid=self.grid
         statoti=0
         game_over=False
-        # print(action)
-        # print(grid[action[1]][action[0]])
-        if(grid[action[1]][action[0]]==-1):
+
+        if(grid[action[0]][action[1]]==-1):
             reward=self.rewards['lose']
             game_over=True
             # grid[action[1]][action[0]]=-1
@@ -218,26 +226,23 @@ class MinesweeperEnv(object):
             self.n_progress += 1
             self.n_wins += 1
             statoti=1
-        elif(state[action[1]][action[0]][0]!=9):
-
+        elif(state[action[0]][action[1]][0]!=9):
             reward = self.rewards['no_progress']
             statoti=2
         else:
-            # if all(t==-0.125 for t in neighbors): # if guess (all neighbors are unsolved)
-            #     reward = self.rewards['guess']
-            # else:
+
             if(self.neighborsnotrevealed(action)):
 
                 reward = self.rewards['guess']
                 self.listtoadd=[]
-                self.emptyroll(action)
+                self.emptyroll((action[1],action[0]))
                 statoti=3
             else:
-
+                print("progress")
                 reward = self.rewards['progress']
                 self.n_progress += 1 # track n of non-isoloated clicks
                 self.listtoadd=[]
-                self.emptyroll(action)
+                self.emptyroll((action[1],action[0]))
                 statoti=4
 
             # new_grid=grid
