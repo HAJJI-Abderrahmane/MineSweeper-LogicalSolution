@@ -58,7 +58,7 @@ class MinesweeperEnv(object):
             machinegrid.append(bb)
 
         randbomb= [(i,j) for i in range(self.cellmax) for j in range(self.cellmax)]
-        random.seed(5)
+        random.seed(0)
         randbomb= random.sample(randbomb,self.bombnumber)
         for i in randbomb:
 
@@ -96,15 +96,15 @@ class MinesweeperEnv(object):
     def visualize_state(self):
         for idxy,bs in enumerate(self.state):
             for idxx,x in enumerate(bs):
-                if(x[0]==9):
+                if(x==9):
                     self.screen.blit(self.cellimg, (idxx*36,idxy*36+self.initialadd))
-                elif(x[0]==10):
+                elif(x==10):
                     self.screen.blit(self.markedimg, (idxx*36,idxy*36+self.initialadd))
-                elif(x[0]==0):
+                elif(x==0):
                     self.screen.blit(self.emptycell2, (idxx*36,idxy*36+self.initialadd))
                 else:
                     self.screen.blit(self.emptycell2,(idxx*36,idxy*36+self.initialadd))
-                    self.writenumber(self.screen,(idxx,idxy),x[0])
+                    self.writenumber(self.screen,(idxx,idxy),x)
         pygame.display.update()
 
 
@@ -115,12 +115,12 @@ class MinesweeperEnv(object):
         for i in range(self.cellmax):
             bb=[]
             for j in range(self.cellmax):
-                bb.append([9])
+                bb.append(9)
             state.append(bb)
 
         # state_im = self.get_state_im(state)
 
-        return np.array(state)
+        return state
 
 
     #     return f'color: {color}'
@@ -149,7 +149,7 @@ class MinesweeperEnv(object):
         numnine=0
         for i in self.state:
             for j in i:
-                if(j[0]==9):
+                if(j==9):
                     numnine+=1
         if(numnine==self.bombnumber):
             return True
@@ -158,56 +158,51 @@ class MinesweeperEnv(object):
     def __eq__(self, otherstate):
         return  self.state == otherstate
 
+    def get_neighbours(self,point):
+        x=point[1]
+        y=point[0]
+        cellmax=self.cellmax
+        alllist=[]
+        toplist=[(y-1,i) for i in range(x-1,x+2) if i>=0 and i<=cellmax-1 and y-1>=0]
+        bottomlist=[(y+1,i) for i in range(x-1,x+2) if i>=0 and i<=cellmax-1 and y+1<cellmax-1]
+        middlelist=[(y,i) for i in range(x-1,x+2,2) if i>=0 and i<=cellmax-1]
+        alllist.extend(toplist)
+        alllist.extend(bottomlist)
+        alllist.extend(middlelist)
+        return alllist
     def emptyroll(self,action):
+
         if(action in self.listtoadd):
             return 0
         self.listtoadd.append(action)
 
-
-        if(self.grid[action[1]][action[0]]==-1):
-
+        if(self.grid[action[0]][action[1]]==-1):
             return 0
-        elif(self.grid[action[1]][action[0]]!=0):
-
-
-            # screen.blit(emptycell2,(cellnumber[0]*36,cellnumber[1]*36+initialadd))
-            # pygame.display.update()
-            # writenumber(screen,cellnumber,machinelist[index],initialadd)
-            self.state[action[1]][action[0]][0]=self.grid[action[1]][action[0]]
+        elif(self.grid[action[0]][action[1]]!=0):
+            self.state[action[0]][action[1]]=self.grid[action[0]][action[1]]
             return 0
         else:
+            neighbors=self.get_neighbours(action)
+            self.state[action[0]][action[1]]=0
+            for i in neighbors:
 
-            self.state[action[1]][action[0]][0]=0
-            ####Top Check
-            if(action[1]-1>=0):
-                self.emptyroll((action[0],action[1]-1))
-            ####Bottom Check
-            if(action[1]+1<self.cellmax):
-                self.emptyroll((action[0],action[1]+1))
-            #####Left Check
-            if(action[0]-1>=0):
-                self.emptyroll((action[0]-1,action[1]))
-            #####Right Check
-            if(action[0]+1<self.cellmax):
-                self.emptyroll((action[0]+1,action[1]))
-            return 0
+                self.emptyroll(i)
 
     def neighborsnotrevealed(self,action):
         revealed=False
         alllist=[]
-        x=action[0]
-        y=action[1]
+        x=action[1]
+        y=action[0]
         toplist=[(i,y-1) for i in range(x-1,x+2) if i>=0 and i<=self.cellmax-1 and y-1>=0]
         bottomlist=[(i,y+1) for i in range(x-1,x+2) if i>=0 and i<=self.cellmax-1 and y+1<self.cellmax-1]
         middlelist=[(i,y) for i in range(x-1,x+2,2) if i>=0 and i<=self.cellmax-1]
         alllist.extend(toplist)
         alllist.extend(bottomlist)
         alllist.extend(middlelist)
-
         if(any([True for i in alllist if self.state[i[1]][i[0]]!=9])): revealed=True
         return revealed
     def mark(self, action):
-        self.state[action]=10
+        self.state[action[0]][action[1]]=10
     def step(self, action):
         state=self.state
         grid=self.grid
@@ -226,7 +221,7 @@ class MinesweeperEnv(object):
             self.n_progress += 1
             self.n_wins += 1
             statoti=1
-        elif(state[action[0]][action[1]][0]!=9):
+        elif(state[action[0]][action[1]]!=9):
             reward = self.rewards['no_progress']
             statoti=2
         else:
@@ -235,14 +230,13 @@ class MinesweeperEnv(object):
 
                 reward = self.rewards['guess']
                 self.listtoadd=[]
-                self.emptyroll((action[1],action[0]))
+                self.emptyroll(action)
                 statoti=3
             else:
-                print("progress")
                 reward = self.rewards['progress']
                 self.n_progress += 1 # track n of non-isoloated clicks
                 self.listtoadd=[]
-                self.emptyroll((action[1],action[0]))
+                self.emptyroll(action)
                 statoti=4
 
             # new_grid=grid
