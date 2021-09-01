@@ -80,6 +80,7 @@ solver=Solver(env)
 
 
 over=True
+whyover="win"
 
 # # solver.env.draw_state()
 # print(solver.env.state[0][3])
@@ -88,11 +89,14 @@ over=True
 
 # print(solver.get_neighbours((2,5)))
 # print(solver.get_neighbours((6,3)))
-
+whyover=0
+step=0
 while(over):
+	print("step : "+str(step))
+	step+=1
 	action=solver.choose_action()
 	# print(action)
-	time.sleep(0.25)
+	# pygame.time.delay(25)
 	# print(action)
 	if(action[0]=="step"):
 		for i in action[1]:
@@ -107,10 +111,19 @@ while(over):
 	solver.env.visualize_state()
 	if(solver.check_win()):
 		print("Win stop")
+		whyover='win'
 		over=False
 	if(solver.check_mistake()):
 		print(solver.check_mistake())
 		print("Mistake Stop")
+		whyover='lose'
 		over=False
+	solver.env.clock.tick(10)
+
+    
+
+solver.env.visualize_state()
 while True:
-	solver.env.visualize_state()
+	
+	solver.env.writetext(whyover)
+

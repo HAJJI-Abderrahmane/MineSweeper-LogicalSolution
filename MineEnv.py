@@ -28,7 +28,7 @@ class MinesweeperEnv(object):
         self.width = 36*cellmax
         self.height = 36*cellmax
         self.FPS = 30
-        self.initialadd=100
+        self.initialadd=0
         self.screen = pygame.display.set_mode((self.width, self.height+self.initialadd),0,32)
         self.cellimg = pygame.image.load('cell.png')
         self.emptycell2 = pygame.image.load('emptycell2.png')
@@ -37,7 +37,9 @@ class MinesweeperEnv(object):
         pygame.init() 
         self.game_opening(self.width,self.height,self.screen,self.initialadd)
         self.font = pygame.font.Font('mine-sweeper.ttf', 18)
+        self.font2 = pygame.font.Font('mine-sweeper.ttf', 50)
         self.colors=[(0,0,255),(0,123,0),(255,0,0),(0,0,123),(123,0,0),(0,123,123),(0,0,0),(123,123,123)]
+        self.clock = pygame.time.Clock()
     def game_opening(self,width,height,screen,initialadd):
         # screen.blit()
         gray = (198, 198, 198)
@@ -58,7 +60,7 @@ class MinesweeperEnv(object):
             machinegrid.append(bb)
 
         randbomb= [(i,j) for i in range(self.cellmax) for j in range(self.cellmax)]
-        random.seed(0)
+        # random.seed(0)
         randbomb= random.sample(randbomb,self.bombnumber)
         for i in randbomb:
 
@@ -78,7 +80,7 @@ class MinesweeperEnv(object):
                     machinegrid[y][x]=number
         return machinegrid
 
-    def writenumber(self,screen,cellnumber,number):
+    def writenumber(self,cellnumber,number):
         color1 = (0, 0, 255)
         blue = (0, 0, 128)
         
@@ -91,7 +93,7 @@ class MinesweeperEnv(object):
         textRect = text.get_rect()
         decay=18
         textRect.center = (cellnumber[0]*36+decay+2,cellnumber[1]*36+self.initialadd+decay)
-        screen.blit(text, textRect)
+        self.screen.blit(text, textRect)
         pygame.display.update()
     def visualize_state(self):
         for idxy,bs in enumerate(self.state):
@@ -104,11 +106,26 @@ class MinesweeperEnv(object):
                     self.screen.blit(self.emptycell2, (idxx*36,idxy*36+self.initialadd))
                 else:
                     self.screen.blit(self.emptycell2,(idxx*36,idxy*36+self.initialadd))
-                    self.writenumber(self.screen,(idxx,idxy),x)
+                    self.writenumber((idxx,idxy),x)
         pygame.display.update()
 
 
-
+    def writetext(self,text):
+        color1 = (0, 0, 255)
+        blue = (0, 0, 128)
+        
+        # font = pygame.font.Font('mine-sweeper.ttf', 50)
+        if(text=="win"):
+            color=(0,170,0)
+        else:
+            color=(200,0,0)
+        text = self.font2.render(text, True,color)  
+        # create a rectangular object for the
+        # text surface object
+        textRect = text.get_rect()
+        textRect.center = ((self.cellmax*36)/2,(self.cellmax*36)/2)
+        self.screen.blit(text, textRect)
+        pygame.display.update()
 
     def init_state(self):
         state=[]
