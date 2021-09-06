@@ -6,6 +6,6 @@ you can run ```Solver.py ``` which will create a new 16 by 16 minesweeper game w
 	- number of unsolved points (near that point) different that zero
 	- number of unsolved points (near that point) plus number of marked points(near that point) is equal to the value of that point
 - When marked points (near that point) is equal to the value of that point, check if the value is different than zero, 
-	- and that there exists an unsolved point(s) as well, then step on those point(s).__
-And the rest is based on luck.__
+	- and that there exists an unsolved point(s) as well, then step on those point(s).<br />
+And the rest is based on luck.<br />
 this project has been inspired by Code-Bullet's version of minesweeper AI : [minesweeper-AI](https://github.com/Code-Bullet/minesweeper-AI)
