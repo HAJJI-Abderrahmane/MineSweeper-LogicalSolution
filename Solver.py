@@ -48,15 +48,6 @@ class Solver(object):
 			
 		solved=self.solved_all()
 		for i in solved:
-			# if( i == (2,5)):
-				
-			# 	print(self.get_neighbours(i))
-			# 	print(self.unsolved_point(i))
-			# 	print(len(self.unsolved_point(i)))
-			# 	print(len(self.marked_point(i)))
-			# 	print(self.env.state[i[0]][i[1]])
-			# 	print("//")
-			# 	if(len(self.unsolved_point(i))-len(self.marked_point(i))==self.env.state[i[0]][i[1]]): print("infirst")
 			"""Rule 1 : Mark unsolved positions that are near point when :
 			---value of points not equal zero
 			---number of unsolved points (near that point) different that zero
@@ -82,13 +73,6 @@ solver=Solver(env)
 over=True
 whyover="win"
 
-# # solver.env.draw_state()
-# print(solver.env.state[0][3])
-# print(solver.env.grid[0][3])
-
-
-# print(solver.get_neighbours((2,5)))
-# print(solver.get_neighbours((6,3)))
 whyover=0
 step=0
 while(over):
