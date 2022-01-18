@@ -1,6 +1,6 @@
 ## I managed to create ai that solves most minesweeper games using simple logic rules
 
-you can run ```Solver.py ``` which will create a new 16 by 16 minesweeper game with 40 bombs, you can change these parameters in ```MineEnv.py ```, then it might get solved automatically using 2 main rules which are :
+you can run ```Solver.py ``` which will create a new 16 by 16 minesweeper game with 40 bombs, you can change these parameters in ```MineEnv.py ```, then it will get solved automatically using 2 main rules which are :
 - Mark unsolved positions that are near point when :
 	- value of points not equal zero
 	- number of unsolved points (near that point) different that zero
